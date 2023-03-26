@@ -73,12 +73,14 @@ public class LoginController {
         User user = null;
 
         try {
-            user = userDao.selectUser(id);
+            user = userDao.selectUser(id); // 원래
+            //user = userDao.selectUser2(id, pwd); // 임시 sql injection test
         } catch (Exception e) {
             e.printStackTrace();
             return false;
         }
-        return user!=null && user.getPwd().equals(pwd);
+        //return user!=null; // 임시 sql injection test
+        return user!=null && user.getPwd().equals(pwd); //원래
     }
 }
 //        return "asdf".equals(id) && "1234".equals(pwd);

@@ -37,7 +37,15 @@
         
         $("#listBtn").on("click", function (){
             // 여기 location이 의미하는것 브라우저창의 주소영역이다. 당연히 get으로 간다.
-            location.href = "<c:url value='/board/list/'/>?page=${page}&pageSize=${pageSize}";
+            location.href = "<c:url value='/board/list'/>?page=${page}&pageSize=${pageSize}";
+        });
+
+        $("#removeBtn").on("click", function() {
+            if(!confirm("정말로 삭제하시겠습니까?")) return ;
+            let form = $('#form');
+            form.attr("action", "<c:url value='/board/remove'/>?page=${page}&pageSize=${pageSize}");
+            form.attr("method", "post");
+            form.submit();
         });
 
     });
