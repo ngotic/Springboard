@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.Date;
 
 @Repository
@@ -57,6 +58,34 @@ public class UserDaoImpl implements UserDao{
         }
         return user;
     }
+
+//    @Override // ' " " '안에 '' 안에 "" > 잠시 sql injection 확인 용도
+//    public User selectUser2(String id, String pwd) throws Exception {
+//        User user=null;
+//        String sql = "select * from user_info where id='"+id+"' and pwd= '" + pwd+ "'";
+//        System.out.println("sql : "+sql);
+//        try (
+//                Connection conn = ds.getConnection();
+//                Statement stmt = conn.createStatement();
+//                //preparedStatement를 일반 statement로 바꿈
+//        ) {
+//
+//            ResultSet rs  = stmt.executeQuery(sql); // select만!! 나머지 insert, update, delete는 executeQuery다.
+//            if(rs.next()){ // 값을 잘 받아왔나??
+//                // rs.next()로 인덱스 옮기고 > rs.get타입(어느요소) > 이방식으로 꺼내온다.
+//                user = new User();
+//                user.setId(rs.getString(1));
+//                user.setPwd(rs.getString(2));
+//                user.setName(rs.getString(3));
+//                user.setEmail(rs.getString(4));
+//                user.setBirth( new Date(rs.getDate(5).getTime()) );
+//                // sql Date객체로 받아오고 이걸 getTime()으로 해서 시간을 얻어오고 util Date로 변환
+//                user.setSns(rs.getString(6));
+//                user.setReg_date(new Date(rs.getTimestamp(7).getTime()));
+//            }
+//        }
+//        return user;
+//    }
 
     @Override
     public int insertUser(User user) throws Exception {
