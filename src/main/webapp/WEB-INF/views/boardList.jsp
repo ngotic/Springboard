@@ -8,6 +8,13 @@
     <title>Title</title>
     <link rel="stylesheet" href="<c:url value='/css/menu.css'/>">
 </head>
+
+<script>
+    let msg ="${msg}";
+    if(msg == "DEL_OK") alert("성공적으로 삭제되었습니다.");
+    if(msg == "DEL_ERR") alert("삭제에 실패하였습니다.");
+</script>
+
 <body>
 <div id="menu">
     <ul>
@@ -19,6 +26,7 @@
         <li><a href=""><i class="fas fa-search small"></i></a></li>
     </ul>
 </div>
+
 <div>
     <div style = "text-align: center">
         <table border="1">
