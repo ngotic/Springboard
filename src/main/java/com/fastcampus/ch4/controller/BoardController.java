@@ -20,6 +20,7 @@ import java.util.Map;
 @RequestMapping("/board")
 public class BoardController {
 
+    // 주석을 입력 해보자 이게 git 인가?
     @Autowired
     BoardService boardService;
 
