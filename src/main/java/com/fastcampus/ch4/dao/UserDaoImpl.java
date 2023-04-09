@@ -68,7 +68,6 @@ public class UserDaoImpl implements UserDao{
 //                Statement stmt = conn.createStatement();
 //                //preparedStatement를 일반 statement로 바꿈
 //        ) {
-//
 //            ResultSet rs  = stmt.executeQuery(sql); // select만!! 나머지 insert, update, delete는 executeQuery다.
 //            if(rs.next()){ // 값을 잘 받아왔나??
 //                // rs.next()로 인덱스 옮기고 > rs.get타입(어느요소) > 이방식으로 꺼내온다.

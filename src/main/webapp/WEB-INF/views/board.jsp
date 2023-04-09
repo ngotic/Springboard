@@ -20,26 +20,55 @@
         <li><a href=""><i class="fas fa-search small"></i></a></li>
     </ul>
 </div>
+<script>
+    let msg = "${msg}";
+    if(msg == "WRT_ERR") alert("게시물 등록에 실패하였습니다. 다시 시도해 주세요.");
+</script>
 <div>
-    <h2>게시물 읽기</h2>
+    <h2>게시물 ${ mode == "new"? "글쓰기" : "읽기" } </h2>
     <form action="" id="form">
-            <input type="text" name="bno" value="${boardDto.bno}" readonly="readonly">
-            <input type="text" name="title" value="${boardDto.title}" readonly="readonly">
-            <textarea name="content" id="" cols="30" rows="10" readonly="readonly">${boardDto.content}</textarea>
-            <button type="button" id="wrtieBtn" class="btn">등록</button>
-            <button type="button" id="modifyBtn" class="btn">수정</button>
-            <button type="button" id="removeBtn" class="btn">삭제</button>
-            <button type="button" id="listBtn" class="btn">목록</button>
+        <input  type="hidden" name="bno" value="${boardDto.bno}">
+        <input  type="text" name="title" value="${boardDto.title}" ${mode == "new" ? '': 'readonly="readonly"'}>
+        <textarea name="content" id="" cols="30" rows="10" ${mode == "new" ? '': 'readonly="readonly"'}>${boardDto.content}</textarea>
+        <button type="button" id="writeBtn"  class="btn">글쓰기</button>
+        <button type="button" id="modifyBtn" class="btn">수정</button>
+        <button type="button" id="removeBtn" class="btn">삭제</button>
+        <button type="button" id="listBtn"   class="btn">목록</button>
     </form>
 </div>
 <script>
     $(document).ready(function(){
-        
         $("#listBtn").on("click", function (){
-            // 여기 location이 의미하는것 브라우저창의 주소영역이다. 당연히 get으로 간다.
+            // 여기 location이 의미하는것 브라우저창의 주소영역이다.당연히 get으로 간다.
             location.href = "<c:url value='/board/list'/>?page=${page}&pageSize=${pageSize}";
         });
 
+        $('#modifyBtn').on("click", function() { // 1. 읽기 상태에면 수정 상태로 변경
+
+            let form = $('#form');
+            let isReadOnly = $("input[name=title]").attr('readonly');
+
+            if(isReadOnly == 'readonly') {
+                $("input[name=title]").attr('readonly', false); // title
+                $("textarea").attr('readonly', false); // content
+                $("#modifyBtn").html("등록"); // 내용임
+                $("h2").html("게시물 수정");
+                return;
+            }
+            // 2. 수정 상태이면, 수정된 내용을 서버로 전송
+            // form.attr("action", "<c:url value='/board/modify'/>?page=${page}&pageSize=${pageSize}");
+            form.attr("action", "<c:url value='/board/modify?page=${page}&pageSize=${pageSize}'/>");
+            form.attr("method", "post");
+            form.submit();
+
+        });
+
+        $("#writeBtn").on("click", function(){
+            let form = $('#form');
+            form.attr("action", "<c:url value='/board/write' />");
+            form.attr("method", "post"); // 이렇게 전송하면 board/write를 controller에서 처리해주면 된다.
+            form.submit();
+        });
         $("#removeBtn").on("click", function() {
             if(!confirm("정말로 삭제하시겠습니까?")) return ;
             let form = $('#form');
@@ -47,7 +76,6 @@
             form.attr("method", "post");
             form.submit();
         });
-
     });
 </script>
 </body>

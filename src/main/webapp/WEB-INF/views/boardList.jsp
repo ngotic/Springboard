@@ -11,7 +11,8 @@
 
 <script>
     let msg ="${msg}";
-    if(msg == "DEL_OK") alert("성공적으로 삭제되었습니다.");
+    if(msg == "WRT_OK")  alert("성공적으로 등록되었습니다.");
+    if(msg == "DEL_OK")  alert("성공적으로 삭제되었습니다.");
     if(msg == "DEL_ERR") alert("삭제에 실패하였습니다.");
 </script>
 
@@ -28,7 +29,8 @@
 </div>
 
 <div>
-    <div style = "text-align: center">
+    <div style = "text-align: center">   <!-- 원래 함수를 만들어야 하는데 그것을 지정해준 것이다. 여러문장 들어가면 ; 쓰기도 한다. 브라우저 주소창이 location.href -->
+        <button type="button" id="writeBtn" onclick="location.href='<c:url value="/board/write"/>'">글쓰기</button>
         <table border="1">
             <tr>
                 <th>번호</th>

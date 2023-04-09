@@ -26,6 +26,7 @@ public class BoardServiceImpl implements BoardService {
 
     @Override
     public int write(BoardDto boardDto) throws Exception {
+        //throw new Exception("test"); // 고의로 실패를 내는 문장
         return boardDao.insert(boardDto);
     }
 
