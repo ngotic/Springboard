@@ -32,8 +32,8 @@ public class BoardController {
         String writer = (String)session.getAttribute("id");
         boardDto.setWriter(writer);
         try {
-            // 왜 이걸로 담으면 안대지?
-//            m.addAttribute("page", page);
+
+//            m.addAttribute("page", page); // 왜 이걸로 담으면 안대지?
 //            m.addAttribute("pageSize", pageSize);
             System.out.printf("page %d", page); // 일로 들어오긴함 근데 redirect 단으로 안넘어건다.
             System.out.printf("pageSize %d", pageSize);
