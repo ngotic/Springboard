@@ -3,6 +3,7 @@ package com.fastcampus.ch4.controller;
 
 import com.fastcampus.ch4.domain.BoardDto;
 import com.fastcampus.ch4.domain.PageHandler;
+import com.fastcampus.ch4.domain.SearchCondition;
 import com.fastcampus.ch4.service.BoardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,9 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,25 +31,21 @@ public class BoardController {
     @PostMapping("/modify")
     //public String remove(Integer bno, Integer page, Integer pageSize, Model m, HttpSession session, RedirectAttributes rattr )
     
-    public String modify(BoardDto boardDto, Integer page, Integer pageSize, Model m,  HttpSession session, RedirectAttributes rattr){
-
+    public String modify(BoardDto boardDto,  SearchCondition sc, Model m,  HttpSession session, RedirectAttributes rattr){
         String writer = (String)session.getAttribute("id");
         boardDto.setWriter(writer);
-        try {
-            // 왜 이걸로 담으면 안대지?
-//            m.addAttribute("page", page);
-//            m.addAttribute("pageSize", pageSize);
-            System.out.printf("page %d", page); // 일로 들어오긴함 근데 redirect 단으로 안넘어건다.
-            System.out.printf("pageSize %d", pageSize);
 
+        System.out.println();
+        try {
+//            m.addAttribute("page", page); // 왜 이걸로 담으면 안대지?
+//            m.addAttribute("pageSize", pageSize);
             int rowCnt = boardService.modify(boardDto);
             if (rowCnt !=1)  throw new Exception("Modify Failed");
             //RedirectAttributes 이게 있으면 다 이걸로 담아서 보내라
-            rattr.addAttribute("page", page);
-            rattr.addAttribute("pageSize", pageSize);
+//            rattr.addAttribute("page", page);
+//            rattr.addAttribute("pageSize", pageSize);
             rattr.addFlashAttribute("msg", "MOD_OK");
-            
-            return "redirect:/board/list";
+            return "redirect:/board/list"+sc.getQueryString();
         } catch (Exception e) {
             e.printStackTrace();
             m.addAttribute(boardDto);
@@ -70,6 +70,7 @@ public class BoardController {
             e.printStackTrace();
             m.addAttribute("boardDto", boardDto);
             //m.addAttribute(boardDto); // 앞에 안써도 된다.
+            m.addAttribute("mode", "new");
             m.addAttribute("msg", "WRT_ERR");
             return "board";
         }
@@ -81,7 +82,7 @@ public class BoardController {
     }
 
     @PostMapping("/remove")
-    public String remove(Integer bno, Integer page, Integer pageSize, Model m, HttpSession session, RedirectAttributes rattr ) {
+    public String remove(Integer bno, SearchCondition sc, Model m, HttpSession session, RedirectAttributes rattr ) {
         String writer = (String)session.getAttribute("id");
         try {
 //            m.addAttribute("page", page);
@@ -90,8 +91,9 @@ public class BoardController {
             if(rowCnt != 1)
                 throw new Exception("board remove error");
             // m.addAttribute("msg", "DEL_OK");
-            rattr.addAttribute("page", page);
-            rattr.addAttribute("pageSize", pageSize);
+            // Session의 Flash영역에 데이터를 저장해놓고 Flash영역에서 데이터를 가지고 와서 사용할수도 있지요.
+//            rattr.addAttribute("page", page);
+//            rattr.addAttribute("pageSize", pageSize);
             rattr.addFlashAttribute("msg", "DEL_OK");
 
         } catch (Exception e) {
@@ -101,56 +103,54 @@ public class BoardController {
             rattr.addFlashAttribute("msg", "DEL_ERR");
             // addFlashAttribute는 model에 addAttribute랑 같이 담아도 전송된다.
         }
-
         // 이렇게 모델에 담으면 redirect할 때 뒤에 ?page= & pageSize= 이렇게 붙는다.
-        return "redirect:/board/list";
+        return "redirect:/board/list"+sc.getQueryString(); // 이렇게 아예 뒤에 붙여버림
     }
 
     @GetMapping("/read")
-    public String read(Integer bno, Integer page, Integer pageSize, Model m){
+    public String read(Integer bno,  SearchCondition sc,RedirectAttributes rattr, Model m){
         // ?bno=숫자 이렇게 오고 이것을 받아서 
         try {
             BoardDto boardDto = boardService.read(bno); // 읽어온 걸 받아야 한다.
                                                 // 함수 호출하고 얻어온 객체를 
             m.addAttribute("boardDto", boardDto); // 이것과 아래문장이 동일 > 이게 board.jsp로 전달
-                           // 여기다가 저장
+            // 여기다가 저장
             // m.addAttribute(boardDto);
-            m.addAttribute("page", page);
-            m.addAttribute("pageSize", pageSize);
+//            m.addAttribute("page", page);
+//            m.addAttribute("pageSize", pageSize);
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            rattr.addFlashAttribute("msg", "READ_ERR");
+            return "redirect:/board/list"+sc.getQueryString();
         }
         return "board"; // 그리고 이걸 board.jsp에 전송
     }
 
     @GetMapping("/list")
-    public String list(Integer page, Integer pageSize, Model m, HttpServletRequest request) {
+    public String list(SearchCondition sc,  Model m, HttpServletRequest request) {
         if(!loginCheck(request)) {
             return "redirect:/login/login?toURL="+request.getRequestURL();
         }
-
-        if(page==null) page=1;
-        if(pageSize==null) pageSize=10;
-
+//        이렇게 지우고 다 default로 할당
+//        if(page==null) page=1;
+//        if(pageSize==null) pageSize=10;
         try {
-            //
-            int totalCnt = boardService.getCount();
-            PageHandler pageHandler = new PageHandler(totalCnt, page, pageSize);
+            int totalCnt = boardService.getSearchResultCnt(sc);
+            m.addAttribute("totalCnt", totalCnt);
+            PageHandler pageHandler = new PageHandler(totalCnt, sc);
 
-            Map map = new HashMap();
-            map.put("offset", (page-1)*pageSize);
-            map.put("pageSize", pageSize);
-
-            List<BoardDto> list = boardService.getPage(map); // 리스트를 모델에 담은
+            List<BoardDto> list = boardService.getSearchResultPage(sc); // 리스트를 모델에 담은
             m.addAttribute("list", list);
             m.addAttribute("ph", pageHandler);
-//          m.addAttribute("page", page);
-//          m.addAttribute("pageSize", pageSize);
 
+            Instant startOfToday = LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant();
+            m.addAttribute("startOfToday", startOfToday.toEpochMilli());
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
+            m.addAttribute("msg", "LIST_ERR");
+            m.addAttribute("totalCnt", 0);
         }
         return "boardList";
     }

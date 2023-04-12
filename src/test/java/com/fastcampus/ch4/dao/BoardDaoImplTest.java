@@ -1,6 +1,7 @@
 package com.fastcampus.ch4.dao;
 
 import com.fastcampus.ch4.domain.BoardDto;
+import com.fastcampus.ch4.domain.SearchCondition;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,49 @@ import static org.junit.Assert.*;
 public class BoardDaoImplTest {
     @Autowired
     BoardDao boardDao;
+    @Test
+    public void searchResultCnt() throws Exception {
+        boardDao.deleteAll();
+        for(int i=1; i<=20 ; i++){
+            BoardDto boardDto = new BoardDto("title"+i, "asdfsdfds","asdf");
+            boardDao.insert(boardDto);
+        }
+        SearchCondition sc = new SearchCondition(1, 10, "title2", "T");
+        int cnt = boardDao.searchResultCnt(sc);
+        System.out.println("list cnt = " + cnt);
+        assertTrue(cnt == 2);
+    }
+
+    @Test
+    public void searchSelectPage() throws Exception {
+        boardDao.deleteAll();
+        for(int i=1; i<=20 ; i++){
+            BoardDto boardDto = new BoardDto("title"+i, "asdfsdfds","asdf"+i);
+            boardDao.insert(boardDto);
+        }
+        SearchCondition sc = new SearchCondition(1, 10, "title2", "T");
+        int cnt = boardDao.searchResultCnt(sc);
+        System.out.println("list cnt = " + cnt);
+        assertTrue(cnt == 2);
+
+        sc = new SearchCondition(1, 10, "asdf2","W");
+        cnt = boardDao.searchResultCnt(sc);
+        System.out.println("cnt = " + cnt);
+        assertTrue(cnt==2);
+
+    }
+
+
+//    @Test
+//    public void searchSelectPageTest() throws Exception {
+//        SearchCondition sc = new SearchCondition(1,
+//                10,
+//                "title",
+//                "T");
+//
+//        List<BoardDto> list = boardDao.searchSelectPage(sc);
+//        System.out.println("list = " + list);
+//    }
 
     @Test
     public void insertData() throws Exception {
