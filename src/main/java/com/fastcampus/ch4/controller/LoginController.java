@@ -46,8 +46,12 @@ public class LoginController {
             return "redirect:/login/login?msg="+msg;
         }
         // 2-2. id와 pwd가 일치하면,
-        //  세션 객체를 얻어오기
+        //  세션 객체를 얻어오기 > 세션은 컨트롤러에서 만들어진다.
         HttpSession session = request.getSession();
+//        HttpSession session = request.getSession(); <---- 여기서 세션을 얻어오는데요. 세션이 없으면 새로 생성합니다.
+//        HttpSession session = request.getSession(true); // 위와 동일. 세션이 있으면 반환 없으면 새로 생성
+//        HttpSession session = request.getSession(false); // 세션이 있으면 반환 없으면 생성 안함.
+
         //  세션 객체에 id를 저장
         session.setAttribute("id", id);
 
@@ -63,7 +67,7 @@ public class LoginController {
 //		       2. 응답에 저장
             response.addCookie(cookie);
         }
-//		       3. 홈으로 이동
+//		3. 홈으로 이동
         toURL = toURL==null || toURL.equals("") ? "/" : toURL;
 
         return "redirect:"+toURL;
