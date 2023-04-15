@@ -70,7 +70,7 @@ public class BoardController {
             e.printStackTrace();
             m.addAttribute("boardDto", boardDto);
             //m.addAttribute(boardDto); // 앞에 안써도 된다.
-            m.addAttribute("mode", "new");
+            m.addAttribute("mode", "new"); // 다시 글쓰기 화면으로
             m.addAttribute("msg", "WRT_ERR");
             return "board";
         }
