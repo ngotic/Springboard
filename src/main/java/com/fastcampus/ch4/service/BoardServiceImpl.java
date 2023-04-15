@@ -41,12 +41,10 @@ public class BoardServiceImpl implements BoardService {
         //throw new Exception("test"); // 고의로 실패를 내는 문장
         return boardDao.insert(boardDto);
     }
-
     @Override
     public List<BoardDto> getList() throws Exception {
         return boardDao.selectAll();
     }
-
     @Override
     public BoardDto read(Integer bno) throws Exception {
         BoardDto boardDto = boardDao.select(bno);
@@ -54,12 +52,10 @@ public class BoardServiceImpl implements BoardService {
 
         return boardDto;
     }
-
     @Override
     public List<BoardDto> getPage(Map map) throws Exception {
         return boardDao.selectPage(map);
     }
-
     @Override
     public int modify(BoardDto boardDto) throws Exception {
         return boardDao.update(boardDto);

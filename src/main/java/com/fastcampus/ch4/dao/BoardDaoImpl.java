@@ -70,7 +70,6 @@ public class BoardDaoImpl implements BoardDao {
         return session.selectOne(namespace+"count");
     }
 
-
     @Override
     public List<BoardDto> searchSelectPage(SearchCondition sc) throws Exception {
         return session.selectList(namespace + "searchSelectPage", sc);
@@ -81,4 +80,12 @@ public class BoardDaoImpl implements BoardDao {
         return session.selectOne(namespace + "searchResultCnt", sc);
     }
 
+    // Ctrl+Alt+B 구현부로 이동
+    @Override // boardDao의 commentCount를 올리거나 내릴때 쓰는 메서드
+    public int updateCommentCnt(Integer bno, int cnt) throws Exception{
+        Map map = new HashMap();
+        map.put("bno", bno);
+        map.put("cnt", cnt);
+        return session.update(namespace+"updateCommentCnt", map);
+    }
 }
