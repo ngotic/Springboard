@@ -12,8 +12,13 @@ comment: <input type="text" name="comment"><br>
 <!-- send버튼을 누르면 input 태그의 내용이 저장이 되도록 하려는 것  -->
 <button id="modBtn" type="button">수정</button>
 
-
 <div id="commentList"></div>
+
+<div id="replyForm" style="display: none">
+    <input type="text" name="replyComment">
+    <button id="wrtRepBtn" type="button">등록</button>
+</div>
+
 <script>
     let bno = 3;
     let showList = function(bno){
@@ -28,8 +33,8 @@ comment: <input type="text" name="comment"><br>
             },
             error : function(){ alert("error"); }
         });
-
     }
+
     $(document).ready(function (){
         showList(bno); // 일단 document가 준비되면 데이터 보여준다.
         // modBtn이 눌리면 본격적으로 전송한다.
@@ -55,6 +60,31 @@ comment: <input type="text" name="comment"><br>
                 }
             });
         });
+
+        $("#wrtRepBtn").click(function(){
+            let comment = $("input[name=replyComment]").val();
+            let pcno = $("#replyForm").parent().attr("data-pcno"); // 답글의 부모이다. 답글의 부모지점만 기억하면 댄다.
+            if(comment.trim()==''){
+                alert("댓글을 입력해주세요.");
+                $("input[name=replyComment]").focus();
+                return;
+            }
+            $.ajax({
+                type: 'POST',
+                url: '/ch4/comments?bno='+bno,
+                headers : {"content-type": "application/json"},
+                data : JSON.stringify({pcno:pcno, bno:bno, comment:comment}),
+                success : function(result) {
+                   alert(result);
+                   showList(bno); // 다시 보여주는 것 하고
+                },
+                error : function () { alert("error") }
+            });
+            $("#replyForm").css("display", "none");
+            $("input[name=replyComment]").val(''); // 입력이 끝났으니까 빈값으로 초기화
+            $("#replyForm").appendTo("body"); // body아래쪽
+        });
+
 
         $("#sendBtn").click(function(){
             let comment = $("input[name=comment]").val();
@@ -96,6 +126,16 @@ comment: <input type="text" name="comment"><br>
             // 이런 두가지 정보를 가지면 컨트롤러로 전달해서 update를 한다.
         });
 
+        $("#commentList").on("click", ".replyBtn", function(){
+
+            // 1. replyForm을 옮기고 > replyBtn의 부모 > li태그의 뒤에 붙인다.
+            $("#replyForm").appendTo($(this).parent());
+
+            // 2. 답글을 입력할 폼을 보여주기 위해 display: block을 건다.
+            $("#replyForm").css("display", "block");
+        });
+
+
         // jQuery의 on메서드
         // 이부분의 함수가 동작이 안됨 .. .delBtn 자체가 아직 생기지 않음
         // $(".delBtn").click(function(){
@@ -120,11 +160,14 @@ comment: <input type="text" name="comment"><br>
             tmp += '<li data-cno='+comment.cno;
             tmp += ' data-pcno=' + comment.pcno;
             tmp += ' data-bno=' + comment.bno + '>';
+            if(comment.cno!=comment.pcno)
+                tmp += 'ㄴ'
             tmp += ' commenter=<span class="commenter">' + comment.commenter + '</span>'
             tmp += ' comment=<span class="comment">' + comment.comment + '</span>'
             tmp += ' up_data='+comment.up_date
             tmp += '<button class="delBtn">삭제</button>'
             tmp += '<button class="modBtn">수정</button>'
+            tmp += '<button class="replyBtn">답글</button>'
             tmp += '</li>'
         }) // 리스트로 하나씩 for문 돈다.
         return tmp + "</ul>";
